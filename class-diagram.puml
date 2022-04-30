@@ -1,0 +1,35 @@
+@startuml class-diagram
+
+hide empty members
+
+class Team
+class Employee
+class HolidayCalendar
+class User
+class Role
+class Permission
+
+class Vacation
+class VacationRequest
+enum VacationRequestState
+
+abstract class VacationPolicy
+class BlockedVacationPolicy
+class CompulsoryVacationPolicy
+class OverlappingVacationPolicy
+
+Team "0..*" *-- "1..*" Employee
+Team "1" o-- "0..*" VacationPolicy
+Employee "0..1" -- "1" User
+Employee "1" o-- "1" HolidayCalendar
+Employee "1" *-- "0..*" Vacation
+(Employee, Vacation) .. VacationRequest
+VacationRequest "1" *-- "1" VacationRequestState
+VacationPolicy <|-- BlockedVacationPolicy
+VacationPolicy <|-- CompulsoryVacationPolicy
+VacationPolicy <|-- OverlappingVacationPolicy
+
+User o-- "1..*" Role
+Role o-- "1..*" Permission
+
+@enduml
