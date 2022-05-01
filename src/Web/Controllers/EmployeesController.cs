@@ -1,5 +1,5 @@
+using Application;
 using Microsoft.AspNetCore.Mvc;
-using Web.Models;
 
 namespace Web.Controllers;
 
@@ -7,9 +7,13 @@ namespace Web.Controllers;
 [Route("[controller]")]
 public class EmployeesController : ControllerBase
 {
-    [HttpGet]
-    public IEnumerable<EmployeeDto> GetEmployees()
+    private readonly EmployeeFacade _facade;
+
+    public EmployeesController(EmployeeFacade facade)
     {
-        return Array.Empty<EmployeeDto>();
+        _facade = facade;
     }
+
+    [HttpGet]
+    public IEnumerable<EmployeeDto> GetEmployees() => _facade.ListEmployees();
 }
