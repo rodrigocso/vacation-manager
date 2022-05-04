@@ -9,5 +9,7 @@ public class FakeRepository<T> : IRepository<T>
 
     public void Add(T entity) => s_entities.Add(entity);
 
+    public void AddMany(IEnumerable<T> entities) => s_entities.AddRange(entities);
+
     public IEnumerable<T> GetAll() => s_entities;
 }
