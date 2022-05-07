@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -58,8 +59,8 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task GivenEmployeesExist_WhenGetEmployees_ThenReturnEmployeesList()
     {
-        var repository = new FakeRepository<Employee>();
-        repository.AddMany(_fixture.CreateMany<Employee>(5));
+        List<Employee> existingEmployees = _fixture.CreateMany<Employee>(5).ToList();
+        FakeRepository<Employee>.AddMany(existingEmployees);
 
         HttpResponseMessage response = await _client.GetAsync("/employees");
         response.EnsureSuccessStatusCode();
@@ -67,6 +68,20 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
         List<EmployeeDto>? employees = await response.Content
             .ReadFromJsonAsync<List<EmployeeDto>>(_jsonSerializerOptions);
 
-        employees.Should().HaveCount(5);
+        employees.Should().BeEquivalentTo(existingEmployees.Select(e => e.ToDto()));
+        FakeRepository<Employee>.Clear();
+    }
+
+    [Fact]
+    public async Task CanSaveNewEmployee()
+    {
+        var employeeDto = _fixture.Create<EmployeeDto>();
+
+        HttpResponseMessage response = await _client
+            .PostAsJsonAsync("/employees", employeeDto, _jsonSerializerOptions);
+        response.EnsureSuccessStatusCode();
+
+        FakeRepository<Employee>.Items.Should().Contain(employee => employee.Id == employeeDto.Id);
+        FakeRepository<Employee>.Clear();
     }
 }

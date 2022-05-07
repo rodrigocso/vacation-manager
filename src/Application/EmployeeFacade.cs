@@ -13,4 +13,6 @@ public class EmployeeFacade
 
     public IEnumerable<EmployeeDto> ListEmployees() => _repository.GetAll()
         .Select(employee => employee.ToDto());
+
+    public void AddEmployee(EmployeeDto employeeDto) => _repository.Add(employeeDto.ToEntity());
 }

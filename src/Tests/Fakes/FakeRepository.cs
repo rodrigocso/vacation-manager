@@ -5,11 +5,13 @@ namespace Tests.Fakes;
 
 public class FakeRepository<T> : IRepository<T>
 {
-    private static readonly List<T> s_entities = new();
+    public static readonly List<T> Items = new();
 
-    public void Add(T entity) => s_entities.Add(entity);
+    public void Add(T entity) => Items.Add(entity);
 
-    public void AddMany(IEnumerable<T> entities) => s_entities.AddRange(entities);
+    public IEnumerable<T> GetAll() => Items;
 
-    public IEnumerable<T> GetAll() => s_entities;
+    public static void AddMany(IEnumerable<T> entities) => Items.AddRange(entities);
+
+    public static void Clear() => Items.Clear();
 }

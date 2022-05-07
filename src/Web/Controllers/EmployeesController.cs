@@ -16,4 +16,11 @@ public class EmployeesController : ControllerBase
 
     [HttpGet]
     public IEnumerable<EmployeeDto> GetEmployees() => _facade.ListEmployees();
+
+    [HttpPost]
+    public IActionResult AddEmployee(EmployeeDto employeeDto)
+    {
+        _facade.AddEmployee(employeeDto);
+        return Ok();
+    }
 }
