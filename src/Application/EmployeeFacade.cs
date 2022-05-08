@@ -4,15 +4,17 @@ namespace Application;
 
 public class EmployeeFacade
 {
-    private readonly IRepository<Employee> _repository;
+    private readonly IEmployeeRepository _repository;
 
-    public EmployeeFacade(IRepository<Employee> repository)
+    public EmployeeFacade(IEmployeeRepository repository)
     {
         _repository = repository;
     }
 
-    public IEnumerable<EmployeeDto> ListEmployees() => _repository.GetAll()
+    public IEnumerable<EmployeeDto> ListEmployees() => _repository.FindEmployees()
         .Select(employee => employee.ToDto());
 
-    public void AddEmployee(EmployeeDto employeeDto) => _repository.Add(employeeDto.ToEntity());
+    public EmployeeDto? FindEmployeeById(long id) => _repository.FindEmployeeById(id).ToDto();
+
+    public void AddEmployee(EmployeeDto employeeDto) => _repository.AddEmployee(employeeDto.ToEntity());
 }

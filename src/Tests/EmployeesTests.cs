@@ -39,7 +39,7 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
         {
             builder.ConfigureServices(services =>
             {
-                services.AddScoped(typeof(IRepository<>), typeof(FakeRepository<>));
+                services.AddScoped<IEmployeeRepository, FakeEmployeeRepository>();
             });
         }).CreateClient();
     }
@@ -60,7 +60,7 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task GivenEmployeesExist_WhenGetEmployees_ThenReturnEmployeesList()
     {
         List<Employee> existingEmployees = _fixture.CreateMany<Employee>(5).ToList();
-        FakeRepository<Employee>.AddMany(existingEmployees);
+        FakeEmployeeRepository.AddMany(existingEmployees);
 
         HttpResponseMessage response = await _client.GetAsync("/employees");
         response.EnsureSuccessStatusCode();
@@ -69,7 +69,7 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
             .ReadFromJsonAsync<List<EmployeeDto>>(_jsonSerializerOptions);
 
         employees.Should().BeEquivalentTo(existingEmployees.Select(e => e.ToDto()));
-        FakeRepository<Employee>.Clear();
+        FakeEmployeeRepository.Clear();
     }
 
     [Fact]
@@ -81,7 +81,21 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
             .PostAsJsonAsync("/employees", employeeDto, _jsonSerializerOptions);
         response.EnsureSuccessStatusCode();
 
-        FakeRepository<Employee>.Items.Should().Contain(employee => employee.Id == employeeDto.Id);
-        FakeRepository<Employee>.Clear();
+        FakeEmployeeRepository.Employees.Should().Contain(employee => employee.Id == employeeDto.Id);
+        FakeEmployeeRepository.Clear();
+    }
+
+    [Fact]
+    public async Task CanFindEmployeeById()
+    {
+        var employee = _fixture.Create<Employee>();
+        FakeEmployeeRepository.Employees.Add(employee);
+
+        HttpResponseMessage response = await _client.GetAsync($"/employees/{employee.Id}");
+        response.EnsureSuccessStatusCode();
+
+        EmployeeDto? employeeDto = await response.Content.ReadFromJsonAsync<EmployeeDto>(_jsonSerializerOptions);
+
+        employeeDto?.Id.Should().Be(employee.Id);
     }
 }
