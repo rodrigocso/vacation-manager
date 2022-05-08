@@ -14,7 +14,7 @@ public class EmployeeFacade
     public IEnumerable<EmployeeDto> ListEmployees() => _repository.FindEmployees()
         .Select(employee => employee.ToDto());
 
-    public EmployeeDto? FindEmployeeById(long id) => _repository.FindEmployeeById(id).ToDto();
+    public EmployeeDto? FindEmployeeById(long id) => _repository.FindEmployeeById(id)?.ToDto();
 
     public void AddEmployee(EmployeeDto employeeDto) => _repository.AddEmployee(employeeDto.ToEntity());
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -97,5 +98,12 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
         EmployeeDto? employeeDto = await response.Content.ReadFromJsonAsync<EmployeeDto>(_jsonSerializerOptions);
 
         employeeDto?.Id.Should().Be(employee.Id);
+    }
+
+    [Fact]
+    public async Task GivenEmployeeDoesNotExist_WhenRequestEmployeeById_ThenRespondWith404()
+    {
+        HttpResponseMessage response = await _client.GetAsync("/employees/1");
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }
