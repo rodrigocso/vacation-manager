@@ -5,6 +5,7 @@ namespace Application;
 public interface IEmployeeRepository
 {
     IEnumerable<Employee> FindEmployees();
-    Employee? FindEmployeeById(long id);
+    Employee? FindEmployeeById(Guid id);
     void AddEmployee(Employee employee);
+    void UpdateEmployee(Employee employee);
 }

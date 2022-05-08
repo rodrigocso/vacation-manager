@@ -17,8 +17,8 @@ public class EmployeesController : ControllerBase
     [HttpGet]
     public IEnumerable<EmployeeDto> GetEmployees() => _facade.ListEmployees();
 
-    [HttpGet("{id:long}")]
-    public ActionResult<EmployeeDto> GetEmployeeById(long id)
+    [HttpGet("{id:Guid}")]
+    public ActionResult<EmployeeDto> GetEmployeeById(Guid id)
     {
         EmployeeDto? employeeDto = _facade.FindEmployeeById(id);
 
@@ -29,9 +29,16 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddEmployee(EmployeeDto employeeDto)
+    public ActionResult<long> AddEmployee(EmployeeDto employeeDto) => Ok(_facade.AddEmployee(employeeDto));
+
+    [HttpPut("{id:Guid}")]
+    public IActionResult UpdateEmployee(Guid id, EmployeeDto employeeDto)
     {
-        _facade.AddEmployee(employeeDto);
-        return Ok();
+        if (id != employeeDto.Id)
+            return BadRequest();
+
+        _facade.UpdateEmployee(employeeDto);
+
+        return NoContent();
     }
 }

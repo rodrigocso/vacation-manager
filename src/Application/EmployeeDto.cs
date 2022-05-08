@@ -1,3 +1,3 @@
 namespace Application;
 
-public record EmployeeDto(long Id, string FirstName, string LastName, DateOnly StartDate);
+public record EmployeeDto(Guid Id, string FirstName, string LastName, DateOnly StartDate);

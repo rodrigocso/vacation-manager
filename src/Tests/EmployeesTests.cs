@@ -82,7 +82,9 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
             .PostAsJsonAsync("/employees", employeeDto, _jsonSerializerOptions);
         response.EnsureSuccessStatusCode();
 
-        FakeEmployeeRepository.Employees.Should().Contain(employee => employee.Id == employeeDto.Id);
+        Guid id = await response.Content.ReadFromJsonAsync<Guid>(_jsonSerializerOptions);
+
+        FakeEmployeeRepository.Employees.Should().ContainKey(id);
         FakeEmployeeRepository.Clear();
     }
 
@@ -90,7 +92,7 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task CanFindEmployeeById()
     {
         var employee = _fixture.Create<Employee>();
-        FakeEmployeeRepository.Employees.Add(employee);
+        FakeEmployeeRepository.Employees.Add(employee.Id, employee);
 
         HttpResponseMessage response = await _client.GetAsync($"/employees/{employee.Id}");
         response.EnsureSuccessStatusCode();
@@ -101,9 +103,39 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task GivenEmployeeDoesNotExist_WhenRequestEmployeeById_ThenRespondWith404()
+    public async Task GivenEmployeeDoesNotExist_WhenRequestEmployeeById_ThenRespondWithNotFound()
     {
-        HttpResponseMessage response = await _client.GetAsync("/employees/1");
+        HttpResponseMessage response = await _client.GetAsync($"/employees/{Guid.NewGuid()}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task CanUpdateExistingEmployee()
+    {
+        var employee = _fixture.Create<Employee>();
+        FakeEmployeeRepository.Employees.Add(employee.Id, employee);
+
+        var employeeDto = new EmployeeDto(employee.Id, "Test", employee.LastName, employee.StartDate);
+
+        HttpResponseMessage response = await _client
+            .PutAsJsonAsync($"/employees/{employee.Id}", employeeDto, _jsonSerializerOptions);
+        response.EnsureSuccessStatusCode();
+
+        FakeEmployeeRepository.Employees[employee.Id].FirstName.Should().Be("Test");
+    }
+
+    [Fact]
+    public async Task GivenEmployeeIdDiffersFromUri_WhenUpdateIsRequested_ThenRespondWithBadRequest()
+    {
+        var employee = _fixture.Create<Employee>();
+        FakeEmployeeRepository.Employees.Add(employee.Id, employee);
+
+        var employeeDto = new EmployeeDto(employee.Id, "Test", employee.LastName, employee.StartDate);
+
+        HttpResponseMessage response = await _client
+            .PutAsJsonAsync($"/employees/{Guid.NewGuid()}", employeeDto, _jsonSerializerOptions);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        FakeEmployeeRepository.Employees[employee.Id].FirstName.Should().NotBe("Test");
     }
 }
