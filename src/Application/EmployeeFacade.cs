@@ -9,18 +9,19 @@ public class EmployeeFacade
         _repository = repository;
     }
 
-    public IEnumerable<EmployeeDto> ListEmployees() => _repository.FindEmployees()
+    public async Task<IEnumerable<EmployeeDto>> ListEmployees() => (await _repository.FindEmployees())
         .Select(employee => employee.ToDto());
 
-    public EmployeeDto? FindEmployeeById(Guid id) => _repository.FindEmployeeById(id)?.ToDto();
+    public async Task<EmployeeDto?> FindEmployeeById(Guid id) => (await _repository.FindEmployeeById(id))?.ToDto();
 
-    public Guid AddEmployee(EmployeeDto employeeDto)
+    public async Task<Guid> AddEmployee(EmployeeDto employeeDto)
     {
         var id = Guid.NewGuid();
-        _repository.AddEmployee(employeeDto.ToEntity(id));
+        await _repository.AddEmployee(employeeDto.ToEntity(id));
 
         return id;
     }
 
-    public void UpdateEmployee(EmployeeDto employeeDto) => _repository.UpdateEmployee(employeeDto.ToEntity());
+    public async Task UpdateEmployee(EmployeeDto employeeDto) => await _repository
+        .UpdateEmployee(employeeDto.ToEntity());
 }

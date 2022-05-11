@@ -15,12 +15,12 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<EmployeeDto> GetEmployees() => _facade.ListEmployees();
+    public async Task<IEnumerable<EmployeeDto>> GetEmployees() => await _facade.ListEmployees();
 
     [HttpGet("{id:Guid}")]
-    public ActionResult<EmployeeDto> GetEmployeeById(Guid id)
+    public async Task<ActionResult<EmployeeDto>> GetEmployeeById(Guid id)
     {
-        EmployeeDto? employeeDto = _facade.FindEmployeeById(id);
+        EmployeeDto? employeeDto = await _facade.FindEmployeeById(id);
 
         if (employeeDto == null)
             return NotFound();
@@ -29,15 +29,16 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult<long> AddEmployee(EmployeeDto employeeDto) => Ok(_facade.AddEmployee(employeeDto));
+    public async Task<ActionResult<long>> AddEmployee(EmployeeDto employeeDto) =>
+        Ok(await _facade.AddEmployee(employeeDto));
 
     [HttpPut("{id:Guid}")]
-    public IActionResult UpdateEmployee(Guid id, EmployeeDto employeeDto)
+    public async Task<IActionResult> UpdateEmployee(Guid id, EmployeeDto employeeDto)
     {
         if (id != employeeDto.Id)
             return BadRequest();
 
-        _facade.UpdateEmployee(employeeDto);
+        await _facade.UpdateEmployee(employeeDto);
 
         return NoContent();
     }

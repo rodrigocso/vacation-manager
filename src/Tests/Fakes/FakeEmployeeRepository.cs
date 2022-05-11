@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Application;
 using Domain;
 
@@ -10,13 +11,21 @@ public class FakeEmployeeRepository : IEmployeeRepository
 {
     public static readonly Dictionary<Guid, Employee> Employees = new();
 
-    public IEnumerable<Employee> FindEmployees() => Employees.Values;
+    public Task<IEnumerable<Employee>> FindEmployees() => Task.FromResult(Employees.Values.AsEnumerable());
 
-    public Employee? FindEmployeeById(Guid id) => Employees.GetValueOrDefault(id);
+    public Task<Employee?> FindEmployeeById(Guid id) => Task.FromResult(Employees.GetValueOrDefault(id));
 
-    public void AddEmployee(Employee employee) => Employees.Add(employee.Id, employee);
+    public Task AddEmployee(Employee employee)
+    {
+        Employees.Add(employee.Id, employee);
+        return Task.CompletedTask;
+    }
 
-    public void UpdateEmployee(Employee employee) => Employees[employee.Id] = employee;
+    public Task UpdateEmployee(Employee employee)
+    {
+        Employees[employee.Id] = employee;
+        return Task.CompletedTask;
+    }
 
     public static void AddMany(IEnumerable<Employee> employees) =>
         employees

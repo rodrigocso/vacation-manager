@@ -15,27 +15,27 @@ public class EmployeeRepository : IEmployeeRepository
         _connectionString = configuration.GetConnectionString("VacationDb");
     }
 
-    public IEnumerable<Employee> FindEmployees()
+    public async Task<IEnumerable<Employee>> FindEmployees()
     {
-        using var connection = new SqliteConnection(_connectionString);
+        await using var connection = new SqliteConnection(_connectionString);
 
-        return connection.Query<Employee>("SELECT * FROM Employee;");
+        return await connection.QueryAsync<Employee>("SELECT * FROM Employee;");
     }
 
-    public Employee? FindEmployeeById(Guid id)
+    public async Task<Employee?> FindEmployeeById(Guid id)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        await using var connection = new SqliteConnection(_connectionString);
 
-        return connection.QueryFirstOrDefault<Employee>(
+        return await connection.QueryFirstOrDefaultAsync<Employee>(
             "SELECT * FROM Employee WHERE Id = @id;",
             new { id });
     }
 
-    public void AddEmployee(Employee employee)
+    public async Task AddEmployee(Employee employee)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        await using var connection = new SqliteConnection(_connectionString);
 
-        connection.Execute(@"
+        await connection.ExecuteAsync(@"
             INSERT INTO Employee (Id, FirstName, LastName, StartDate)
             VALUES (@Id, @FirstName, @LastName, @StartDate);",
             new
@@ -47,11 +47,11 @@ public class EmployeeRepository : IEmployeeRepository
             });
     }
 
-    public void UpdateEmployee(Employee employee)
+    public async Task UpdateEmployee(Employee employee)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        await using var connection = new SqliteConnection(_connectionString);
 
-        connection.Execute(@"
+        await connection.ExecuteAsync(@"
             UPDATE Employee
             SET
                 FirstName = @FirstName,
