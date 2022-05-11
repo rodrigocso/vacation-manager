@@ -14,4 +14,12 @@ public class Employee
         LastName = lastName;
         StartDate = startDate;
     }
+
+    public Employee(string id, string firstName, string lastName, string startDate)
+    {
+        Id = Guid.Parse(id);
+        FirstName = firstName;
+        LastName = lastName;
+        StartDate = DateOnly.Parse(startDate);
+    }
 }

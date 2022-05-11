@@ -12,6 +12,7 @@ using Domain;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Tests.Fakes;
@@ -38,6 +39,10 @@ public class EmployeesTests : IClassFixture<WebApplicationFactory<Program>>
 
         _client = factory.WithWebHostBuilder(builder =>
         {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddAuthentication();
+            });
             builder.ConfigureServices(services =>
             {
                 services.AddScoped<IEmployeeRepository, FakeEmployeeRepository>();

@@ -156,6 +156,10 @@ csharp_space_between_square_brackets = false
 curly_bracket_next_line = true
 indent_brace_style = Allman
 
+# Json files
+[*.json]
+indent_size = 2
+
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
 indent_size = 2
